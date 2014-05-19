@@ -1,6 +1,6 @@
 <?php
 /*
- * baidu class | Version 0.1.1 | Copyright 2014, Cai Cai | Released under the MIT license
+ * baidu class | Version 0.9.0 | Copyright 2014, Cai Cai | Released under the MIT license
  * login、sign、post、zan、meizhi、tdou
  */
 class baidu{
@@ -15,7 +15,7 @@ class baidu{
 	protected $bduss      = '';
 	protected $cookies    = '';
 	protected $client     = array();
-	protected $formData  = array();
+	protected $formData   = array();
 	protected $forumPages = array();
 	public function __construct($cookie = NULL,$client = NULL){
 		if(!is_null($cookie)){
@@ -349,7 +349,7 @@ EOF;
 	public function login($un,$passwd,$vcode = NULL,$vcode_md5 = NULL){
 		$this->formData = array (
 				'isphone' => '0',
-				'passwd'  => $passwd,
+				'passwd'  => base64_encode($passwd),
 				'un'      => $un
 		);
 		if(!is_null($vcode) && !is_null($vcode_md5)){
@@ -364,13 +364,15 @@ EOF;
 			$result['i'] = array(
 					"id"    => $result['user']['id'],
 					"name"  => $result['user']['name'],
-					"BDUSS" => $result['user']['BDUSS']
+					"bduss" => $result['user']['BDUSS']
 			);
 		}elseif($result['error_code'] == 5){
 			$result['i'] = array(
-					"need_vcode"    => $result['anti']['need_vcode'],
-					"vcode_md5"     => $result['anti']['vcode_md5'],
-					"vcode_pic_url" => $result['anti']['vcode_pic_url']
+				'un'            => $un,
+				'passwd'        => base64_encode($passwd),
+				"need_vcode"    => $result['anti']['need_vcode'],
+				"vcode_md5"     => $result['anti']['vcode_md5'],
+				"vcode_pic_url" => $result['anti']['vcode_pic_url']
 			);
 		}
 		return $this->commonReturn($result);
@@ -401,20 +403,21 @@ EOF;
 		$result = $this->fetch('http://c.tieba.baidu.com/c/f/forum/getforumlist');
 		return $result['forum_info'];
 	}
-	public function multiSign(){
-		$forums = $this->get_msign_forum_list();
+	public function signMulti(){
+		$forums = $this->fetchClientMultisignForumList();
 		$forum_ids = '';
 		foreach($forums as $forum){
-			$forum_ids .= $forum . ',';
-		}
+			$forum_ids .= $forum['forum_id'] . ',';
+		}		
 		$forum_ids = substr($forum_ids,0,-1);
 		$this->formData = array(
-				'forum_ids' => '',
+				'forum_ids' => $forum_ids,
 				'tbs' => $this->tbs(),
 				'user_id' => $this->uid()
 		);
 		$result = $this->fetch('http://c.tieba.baidu.com/c/c/forum/msign');
-		return $result['forum_info'];
+
+		return $result['info'];
 	}
 	public function post($kw,$fid = NULL,$tid = NULL,$content = NULL){
 		if(is_null($fid)) $fid = $this->getForumInfo($kw,'fid');
@@ -580,8 +583,8 @@ EOF;
 		);
 		return $this->commonReturn($result);
 	}
-	public function tdouLottery($free = TRUE){
-		if($free === TRUE){
+	public function tdouLottery($free = FALSE){
+		if($free === FALSE){
 			$this->formData = array(
 					'kw' => '',
 					'tbs' => $this->tbs()
