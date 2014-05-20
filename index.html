@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="BaiduUtil : 这是一个方便广大小学生艹百度贴吧的类，使用了多种语言编写，祝大家艹吧生活愉快。" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>BaiduUtil</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/iicx/BaiduUtil">View on GitHub</a>
+
+          <h1 id="project_title">BaiduUtil</h1>
+          <h2 id="project_tagline">这是一个方便广大小学生艹百度贴吧的类，使用了多种语言编写，祝大家艹吧生活愉快。</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/iicx/BaiduUtil/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/iicx/BaiduUtil/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a name="baiduutil%E7%99%BE%E5%BA%A6%E8%B4%B4%E5%90%A7%E5%B7%A5%E5%85%B7%E7%B1%BB" class="anchor" href="#baiduutil%E7%99%BE%E5%BA%A6%E8%B4%B4%E5%90%A7%E5%B7%A5%E5%85%B7%E7%B1%BB"><span class="octicon octicon-link"></span></a>BaiduUtil(百度贴吧工具类)</h1>
+
+<p>这是一个方便广大小学生艹百度贴吧的类，使用了多种语言编写，祝大家艹吧生活愉快。</p>
+
+<h2>
+<a name="%E5%BC%80%E5%A7%8B" class="anchor" href="#%E5%BC%80%E5%A7%8B"><span class="octicon octicon-link"></span></a>开始</h2>
+
+<p>只需要两行代码，你就可以完成一个贴吧的签到：</p>
+
+<pre><code>$test = new BaiduUtil($cookie);
+$test-&gt;sign("chrome");
+</code></pre>
+
+<p>下面这几行代码展示了如何完成连续的一系列动作，在这个示例里，我们传入了一个客户端$client(可选)：</p>
+
+<pre><code>$test = new BaiduUtil($cookie, $client);
+$test-&gt;returnThis()-&gt;zan("chrome")-&gt;zan("firefox")-&gt;multiSign()-&gt;meizhi("星弦雪")-&gt;post("显卡");
+</code></pre>
+
+<p>在这个示例里，我们通过开启链式调用，完成了点赞、客户端一键签到，并为@星弦雪 投了妹纸票，最后在显卡吧水了一贴:)。</p>
+
+<p>当然，这只是一小部分功能，详细请参见方法手册。</p>
+
+<h2>
+<a name="%E6%96%B9%E6%B3%95%E6%89%8B%E5%86%8C" class="anchor" href="#%E6%96%B9%E6%B3%95%E6%89%8B%E5%86%8C"><span class="octicon octicon-link"></span></a>方法手册</h2>
+
+<h3>
+<a name="%E7%99%BB%E5%BD%95" class="anchor" href="#%E7%99%BB%E5%BD%95"><span class="octicon octicon-link"></span></a>登录</h3>
+
+<p><strong>原型</strong></p>
+
+<pre><code>public function login($un,$passwd,$vcode = NULL,$vcode_md5 = NULL)
+</code></pre>
+
+<p><strong>返回值(array)</strong></p>
+
+<p>如果登陆成功</p>
+
+<ul>
+<li>uid……用户的uid</li>
+<li>un……用户名</li>
+<li>bduss……BDUSS</li>
+<li>cookie</li>
+</ul><p>如果需要验证码</p>
+
+<ul>
+<li>un……用户名</li>
+<li>passwd……密码</li>
+<li>need_vcode……需要验证码时为1，否则为0</li>
+<li>vcode_md5……验证码MD5【可以存在session中】</li>
+<li>vcode_pic_url……验证码地址</li>
+</ul><hr><h3>
+<a name="%E5%8F%91%E5%B8%96" class="anchor" href="#%E5%8F%91%E5%B8%96"><span class="octicon octicon-link"></span></a>发帖</h3>
+
+<pre><code>protected function doPost($kw,$fid = NULL,$tid = NULL,$content = NULL)
+</code></pre>
+
+<h2>
+<a name="%E5%BC%82%E5%B8%B8%E8%BF%94%E5%9B%9E%E5%80%BC" class="anchor" href="#%E5%BC%82%E5%B8%B8%E8%BF%94%E5%9B%9E%E5%80%BC"><span class="octicon octicon-link"></span></a>异常返回值</h2>
+
+<p>百度工具类在内部处理大部分异异常并返回负值的错误码，能在外部捕获的异常只有构造函数中异常</p>
+
+<ul>
+<li>-10 fetch() 网络连接失败</li>
+<li>-11 fetch() 未收到正确数据</li>
+<li>-12 getForumInfo() 无可赞的帖子</li>
+<li>-13 getForumInfo() 无法取得pid</li>
+<li>-14 fetchWebTbs() 获取webtbs失败</li>
+<li>-15 clientRelogin() clientRelogin失败</li>
+<li>-16 doTdouLottery() 免费抽奖机会已经用完 </li>
+<li>-17 doMultiSign() 没有可以一键签到的贴吧</li>
+<li>-18 getForumInfo() 获取的贴吧页面没有点赞信息</li>
+<li>-99 __construct() 请输入合法的cookie</li>
+</ul>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">BaiduUtil maintained by <a href="https://github.com/iicx">iicx</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
