@@ -99,6 +99,11 @@ class BaiduUtil{
 		return $result;
 	}
 
+	public function returnThis(){
+		$this->returnThis = TRUE;
+		return $this;
+	}
+
 	public static function simpleFetch($url){
 		$ch = curl_init($url);
 		curl_setopt($ch,CURLOPT_HTTPHEADER,array(
@@ -463,9 +468,10 @@ EOF;
 			$this->bduss = $result['user']['BDUSS'];
 			$this->cookie = $this->buildFullCookie();
 			$result['i'] = array(
-					"id"    => $result['user']['id'],
-					"name"  => $result['user']['name'],
-					"bduss" => $result['user']['BDUSS'],
+					"uid"    => $result['user']['id'],
+					"un"  => $result['user']['name'],
+					"bduss" => $this->bduss,
+					"cookie"=>$this->cookie,
 			);
 		}elseif($result['error_code'] == 5){
 			$result['i'] = array(
