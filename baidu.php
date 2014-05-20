@@ -155,6 +155,10 @@ class baidu{
 
 	public function un(){
 		if(empty($this->un)) $this->clientRelogin();
+		if(empty($this->un)){
+			$result = $this->fetchWebUserInfo();
+			$this->un = $result['data']['un'];
+		}
 		return $this->un;
 	}
 
@@ -306,26 +310,35 @@ class baidu{
 			);
 	}
 
-	public function fetchFansList(){
-		$result = $this->fetch('http://c.tieba.baidu.com/c/u/fans/page');
-		$temHeadPhoto = array ();
-		foreach ($result['user_list'] as &$temFans) {
-			$temFans['head_photo'] = 'http://tb.himg.baidu.com/sys/portrait/item/'.$temFans['portrait'];
-			$temHeadPhoto[] = $temFans['head_photo'];
-		}
-		$result['head_photo'] = $temHeadPhoto;
+	public function fetchFansList($num = NULL){
+		$result = $this->fetchFollowAndFansList('fans',$num);
 		return $result;
 	}
 
-	public function fetchFollowList(){
-		$result = $this->fetch('http://c.tieba.baidu.com/c/u/follow/page');
+	public function fetchFollowList($num = NULL){
+		$result = $this->fetchFollowAndFansList('follow',$num);
+		return $result;
+	}
+
+	protected function fetchFollowAndFansList($type, $num){
+		if($type == 'fans'){
+			$result = $this->fetch('http://c.tieba.baidu.com/c/u/fans/page');
+		}else{
+			$result = $this->fetch('http://c.tieba.baidu.com/c/u/follow/page');
+		}
 		$temHeadPhoto = array ();
 		foreach ($result['user_list'] as &$temFans) {
 			$temFans['head_photo'] = 'http://tb.himg.baidu.com/sys/portrait/item/'.$temFans['portrait'];
 			$temHeadPhoto[] = $temFans['head_photo'];
 		}
-		$result['head_photo'] = $temHeadPhoto;
-		return $result;
+		unset($temFans);
+		$result['i']['user_list'] = $result['user_list'];//id intro is_followed name portrait
+		$result['i']['head_photo_list'] = $temHeadPhoto;
+		if((!is_null($num)) && ($num < count($temHeadPhoto)){
+			$result['i']['user_list'] = array_slice($result['user_list'], 0, $num);
+			$result['i']['head_photo_list'] = array_slice($result['head_photo_list'], 0, $num);
+		}
+		return $this->commonReturn($result);
 	}
 
 	public function fetchClientLikedForumList(){
@@ -335,7 +348,8 @@ class baidu{
 				'topic' => '0'
 		);
 		$result = $this->fetch('http://c.tieba.baidu.com/c/f/forum/forumrecommend');
-		return $result['like_forum'];
+		$result['i'] = $result['like_forum'];//avatar贴吧头像 forum_id forum_name is_sign level_id
+		return $this->commonReturn($result);
 	}
 
 	public function fetchClientMultisignForumList(){
@@ -343,7 +357,8 @@ class baidu{
 				'user_id' => $this->uid()
 		);
 		$result = $this->fetch('http://c.tieba.baidu.com/c/f/forum/getforumlist');
-		return $result['forum_info'];
+		$result['i'] = $result['forum_info']
+		return $this->commonReturn($result);
 	}
 
 	public static function getClient($type = NULL,$model = NULL,$version = NULL){
@@ -353,7 +368,7 @@ class baidu{
 			'_client_version' => is_null($version)?'6.0.1':$version,
 			'_phone_imei'     => md5(self::random(16,TRUE)),
 			'cuid'            => strtoupper(md5(self::random(16))) . '|' . self::random(15,TRUE),
-			'model'           => is_null($model)?'M1':$model
+			'model'           => is_null($model)?'M1':$model,
 		);
 		return $client;
 	}
@@ -450,7 +465,7 @@ EOF;
 			$result['i'] = array(
 					"id"    => $result['user']['id'],
 					"name"  => $result['user']['name'],
-					"bduss" => $result['user']['BDUSS']
+					"bduss" => $result['user']['BDUSS'],
 			);
 		}elseif($result['error_code'] == 5){
 			$result['i'] = array(
@@ -458,7 +473,7 @@ EOF;
 				'passwd'        => base64_encode($passwd),
 				"need_vcode"    => $result['anti']['need_vcode'],
 				"vcode_md5"     => $result['anti']['vcode_md5'],
-				"vcode_pic_url" => $result['anti']['vcode_pic_url']
+				"vcode_pic_url" => $result['anti']['vcode_pic_url'],
 			);
 		}
 		return $this->commonReturn($result);
@@ -484,7 +499,7 @@ EOF;
 		$this->formData = array(
 				'forum_ids' => $forum_ids,
 				'tbs' => $this->tbs(),
-				'user_id' => $this->uid()
+				'user_id' => $this->uid(),
 		);
 		$result = $this->fetch('http://c.tieba.baidu.com/c/c/forum/msign');
 		$result['i'] = $result['info'];
@@ -543,9 +558,12 @@ EOF;
 				'meizhi',
 				'meizhi',
 				'weiniang',
-				'renyao'
+				'renyao',
 		);
-		if(is_null($meizhi_uid)) $meizhi_uid = self::fetchWebUserPanel($meizhi_un)['uid'];
+		if(is_null($meizhi_uid)){
+			$temResult = self::fetchWebUserPanel($meizhi_un);
+			$meizhi_uid = $temResult['data']['uid'];
+		}
 		$this->formData = array(
 				'content'   => '',
 				'tbs'       => $this->tbs(),
@@ -557,7 +575,7 @@ EOF;
 				'ie'        => 'utf-8',
 				'vcode'     => '',
 				'new_vcode' => '1',
-				'tag'       => '11'
+				'tag'       => '11',
 		);
 		$result = $this->fetch('http://tieba.baidu.com/encourage/post/meizhi/vote',FALSE);
 		if($result['no'] == 0){
@@ -575,7 +593,7 @@ EOF;
 		$this->formData = array(
 				'ie'  => 'utf-8',
 				'tbs' => $this->tbs(),
-				'fr'  => 'frs'
+				'fr'  => 'frs',
 		);
 		$result = $this->fetch('http://tieba.baidu.com/tbscore/timebeat',FALSE); // 查看状态，是否时间已到
 		$retime = $result['data']['time_stat'];
@@ -599,12 +617,12 @@ EOF;
 						'ie'       => 'utf-8',
 						'type'     => $type,
 						'tbs'      => $this->tbs(),
-						'gift_key' => $gift['gift_key']
+						'gift_key' => $gift['gift_key'],
 				);
 				$result = $this->fetch('http://tieba.baidu.com/tbscore/opengift',FALSE);
 				$score_info[] = array(
 						'gift_type' => $gift['gift_type'],
-						'score'     => $result['data']['gift_got']['gift_score']
+						'score'     => $result['data']['gift_got']['gift_score'],
 				);
 			}
 		}
@@ -618,7 +636,7 @@ EOF;
 				'time_has_score' => $result['data']['time_stat']['time_has_score'],/* bull 时间奖励是否已经领完 */
 				'got_tdou'       => $got_tdou,/* 是否获取到豆票 */
 				'total_score'    => $total_score,/* 获取的数目 */
-				'score_info'     => $score_info/* 详细信息 */
+				'score_info'     => $score_info,/* 详细信息 */
 		);
 		return $this->commonReturn($result);
 	}
@@ -641,7 +659,7 @@ EOF;
 				'new_price' => $result['data']['new_price'], // 下一次抽奖所需的T豆
 				'win_type'  => $result['data']['award']['win_type'], // 获奖的类型
 				'win_id'    => $result['data']['award']['win_id'],
-				'win_tips'  => $result['data']['award']['win_tips'] /*奖品信息*/
+				'win_tips'  => $result['data']['award']['win_tips'], /*奖品信息*/
 		);
 		return $this->commonReturn($result);
 	}
