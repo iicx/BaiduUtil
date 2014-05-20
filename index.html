@@ -31,9 +31,7 @@
     <!-- MAIN CONTENT -->
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
-        <p>百度贴吧工具类。祝贴吧生活愉快~~</p>
-
-<h2>
+        <h2>
 <a name="%E5%BC%80%E5%A7%8B" class="anchor" href="#%E5%BC%80%E5%A7%8B"><span class="octicon octicon-link"></span></a>开始</h2>
 
 <p>只需要两行代码，你就可以完成一个贴吧的签到：</p>
@@ -90,12 +88,36 @@ $test-&gt;returnThis()-&gt;zan("chrome")-&gt;zan("firefox")-&gt;multiSign()-&gt;
 <li>vcode_md5……验证码MD5【可以存在session中】</li>
 <li>vcode_pic_url……验证码地址</li>
 </ul><hr><h3>
-<a name="%E5%8F%91%E5%B8%96" class="anchor" href="#%E5%8F%91%E5%B8%96"><span class="octicon octicon-link"></span></a>发帖</h3>
+<a name="%E7%AD%BE%E5%88%B0" class="anchor" href="#%E7%AD%BE%E5%88%B0"><span class="octicon octicon-link"></span></a>签到</h3>
 
-<pre><code>protected function doPost($kw,$fid = NULL,$tid = NULL,$content = NULL)
+<p><strong>原型</strong></p>
+
+<pre><code>public function sign($kw, $fid = NULL)
 </code></pre>
 
-<p>虽然大部分参数可以省略，但为了减少HTTP请求并加快速度，请尽量传入所有已知参数</p>
+<p><strong>参数</strong></p>
+
+<ul>
+<li>$fid……重要，签到贴吧的tid</li>
+<li>$kw……必须，签到贴吧名</li>
+</ul><p><strong>返回值</strong></p>
+
+<ul>
+<li>fid……签到贴吧的tid</li>
+<li>kw……签到贴吧名</li>
+</ul><hr><h3>
+<a name="%E5%8F%91%E5%B8%96" class="anchor" href="#%E5%8F%91%E5%B8%96"><span class="octicon octicon-link"></span></a>发帖</h3>
+
+<p><strong>原型</strong></p>
+
+<pre><code>public function post($kw,$fid = NULL,$tid = NULL,$content = NULL)
+</code></pre>
+
+<p><strong>参数</strong></p>
+
+<p>虽然大部分参数可以省略，但为了减少HTTP请求并加快速度，请尽量传入$fid,$tid,$kw</p>
+
+<p><strong>返回值</strong></p>
 
 <h2>
 <a name="%E5%BC%82%E5%B8%B8" class="anchor" href="#%E5%BC%82%E5%B8%B8"><span class="octicon octicon-link"></span></a>异常</h2>
