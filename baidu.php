@@ -1,9 +1,9 @@
 <?php
 /*
- * baidu class | Version 1.0.0 | Copyright 2014, Cai Cai | Released under the MIT license
+ * baidu class | Version 1.0.1 | Copyright 2014, Cai Cai | Released under the MIT license
  * login、sign、post、zan、meizhi、tdou
  */
-class baidu{
+class BaiduUtil{
 
 	public $useZlib       = FALSE;
 	public $returnThis    = FALSE;
