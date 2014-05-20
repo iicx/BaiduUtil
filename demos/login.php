@@ -10,7 +10,7 @@ if($_POST){
   @$vcode=$_POST['vcode'];
   try{
      $client =  json_decode('{"_client_id":"wappc_1386816224047_167","_client_type":1,"_client_version":"6.0.1","_phone_imei":"a6ca20a897260bb1a1529d1276ee8176","cuid":"96D360F8BCF3AF6DA212A1429F6B2D75|046284918454666","model":"M1"}',true);
-    $test_login=new baidu(NULL,$client);
+    $test_login=new BaiduUtil(NULL,$client);
     if(empty($vcode)){
       $result=$test_login->login($username,$password);
     }else{
