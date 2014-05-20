@@ -13,4 +13,6 @@ x_baidu_tieba_easily
 -14 fetchWebTbs() 获取webtbs失败
 -15 clientRelogin() clientRelogin失败
 -16 doTdouLottery() 免费抽奖机会已经用完 
+-17 doMultiSign() 没有可以一键签到的贴吧
+-18 getForumInfo() 获取的贴吧页面没有点赞信息
 -99 __construct() 请输入合法的cookie
