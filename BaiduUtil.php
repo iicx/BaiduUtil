@@ -253,6 +253,7 @@ class BaiduUtil{
 		);
 		$result=$this->fetch("http://c.tieba.baidu.com/c/u/user/profile");
 		$result['i']=array(
+			'id'			 =>$result['user']['id'],
 			'un'             =>$result['user']['name'],
 			'sex'            =>$result['user']['sex'],
 			'tb_age'         =>$result['user']['tb_age'],
