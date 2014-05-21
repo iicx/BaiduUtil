@@ -9,13 +9,13 @@ class BaiduUtil{
 	public $returnThis    = FALSE;
 	public $lastFetch     = array();
 	public $lastReturn    = array();
-	public $lastformData = array();
-
+	public $lastformData  = array();
+	
 	protected $un         = '';
 	protected $uid        = '';
 	protected $tbs        = '';
 	protected $bduss      = '';
-	protected $cookie    = '';
+	protected $cookie     = '';
 	protected $client     = array();
 	protected $formData   = array();
 	protected $forumPages = array();

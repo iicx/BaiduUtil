@@ -1,8 +1,3 @@
-BaiduUtil(百度贴吧工具类)
-====================
-
-百度贴吧工具类。祝贴吧生活愉快~~
-
 ##开始
 
 只需要两行代码，你就可以完成一个贴吧的签到：
@@ -19,6 +14,13 @@ BaiduUtil(百度贴吧工具类)
 
 当然，这只是一小部分功能，详细请参见方法手册。
 
+##返回值
+
+- 大多数方法都返回一个数组['status'=>(int),'msg'=>(string),'data'=>(array)]
+- status = 0 ,则此方法执行成功，否则返回错误码
+- msg是错误信息
+- data数组中返回主要数据
+- 以下方法手册中的返回值，若未特别说明，都是指data数组中的返回值
 
 ##方法手册
 
@@ -29,7 +31,6 @@ BaiduUtil(百度贴吧工具类)
 	public function login($un,$passwd,$vcode = NULL,$vcode_md5 = NULL)
 
 **返回值(array)**
-
 
 如果登陆成功
 
@@ -46,17 +47,41 @@ BaiduUtil(百度贴吧工具类)
 - vcode_md5……验证码MD5【可以存在session中】
 - vcode_pic_url……验证码地址
 
+----------
+
+###签到
+
+**原型**
+
+	public function sign($kw, $fid = NULL)
+
+**参数**
+
+- $fid……重要，签到贴吧的tid
+- $kw……必须，签到贴吧名
+
+**返回值**
+
+- fid……签到贴吧的tid
+- kw……签到贴吧名
 
 ----------
 
 ###发帖
 
-	protected function doPost($kw,$fid = NULL,$tid = NULL,$content = NULL)
+**原型**
 
+	public function post($kw,$fid = NULL,$tid = NULL,$content = NULL)
 
-##异常返回值
+**参数**
 
-百度工具类在内部处理大部分异异常并返回负值的错误码，能在外部捕获的异常只有构造函数中异常
+虽然大部分参数可以省略，但为了减少HTTP请求并加快速度，请尽量传入$fid,$tid,$kw
+
+**返回值**
+
+##异常
+
+百度工具类在内部处理大部分异常并返回负值的错误码，能在外部捕获的异常只有构造函数中的异常
 
 - -10 fetch() 网络连接失败
 - -11 fetch() 未收到正确数据
