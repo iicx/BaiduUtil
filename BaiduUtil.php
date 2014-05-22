@@ -21,20 +21,20 @@ class BaiduUtil{
 	protected $forumPages = array();
 
 	public function __construct($cookie = NULL, $userinfo = array(), $client = NULL){
+		$cookie = trim($cookie);
 		if(empty($cookie)) throw new Exception('请输入合法的cookie',-99);
-		else{
-			$cookie = trim($cookie);
-			if(stripos($cookie,'bduss=') === FALSE && stripos($cookie,';') === FALSE){
-				$this->bduss = $cookie;
-			}elseif(stripos($cookie,'bduss=') !== FALSE && stripos($cookie,';') === FALSE){
-				$this->bduss = substr($cookie,6);
-			}elseif(preg_match('/bduss\s?=\s?([^ ;]*)/i',$cookie,$matches)){
-				$this->bduss = $matches[1];
-			}else{
-				throw new Exception('请输入合法的cookie',-99);
-			}
-			$this->cookie = $this->buildFullCookie();
+		$temCookieHasBduss = stripos($cookie,'bduss=');
+		$temCookieHasSemicolon = stripos($cookie,';');
+		if($temCookieHasBduss === FALSE &&  $temCookieHasSemicolon === FALSE){
+			$this->bduss = $cookie;
+		}elseif($temCookieHasBduss !== FALSE && $temCookieHasSemicolon === FALSE){
+			$this->bduss = substr($cookie,6);
+		}elseif(preg_match('/bduss\s?=\s?([^ ;]*)/i',$cookie,$matches)){
+			$this->bduss = $matches[1];
+		}else{
+			throw new Exception('请输入合法的cookie',-99);
 		}
+		$this->cookie = $this->buildFullCookie();
 		if(is_null($client)){
 			$this->client = self::getClient();
 		}else{
@@ -455,6 +455,16 @@ EOF;
 					'点经验和' . $result['levelup_left'] . '张妹纸票后升级。';
 		$result['str'] = $resultstr;
 		return  $result;
+	}
+
+	public static function fetchUid($un){
+		$result = self::fetchWebUserPanel($un);
+		return $result['data']['uid'];
+	}
+
+	public static function fetchHeadPhoto($un){
+		$result = self::fetchWebUserPanel($un);
+		return $result['data']['head_photo'];
 	}
 
 	public function login($un,$passwd,$vcode = NULL,$vcode_md5 = NULL){
