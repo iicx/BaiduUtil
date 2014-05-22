@@ -161,7 +161,18 @@ class BaiduUtil{
 				'bdusstoken' => $this->bduss
 		);
 		$result = $this->fetch('http://c.tieba.baidu.com/c/s/login');
-		if($result['error_code'] != 0) throw new Exception('Relogin失败',-15);
+		if($result['error_code'] != 0){
+			switch ($result['error_code']) {
+				case 1:
+				case 1990006:
+					throw new Exception('用户未登录或登录失败，请更换账号或重试',-19);
+					break;
+				default:
+					throw new Exception('Relogin失败,status:'.$result['error_code'].',msg'.$result['error_msg'],-15);
+					break;
+			}
+			
+		}
 	}
 
 	public function un(){
