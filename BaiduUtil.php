@@ -167,7 +167,7 @@ class BaiduUtil{
 	public function un(){
 		if(empty($this->un)) $this->clientRelogin();
 		if(empty($this->un)){
-			$result = $this->fetchWebUserInfo();
+			$result = $this->fetchWebUserPrivateInfo();
 			$this->un = $result['data']['un'];
 		}
 		return $this->un;
@@ -190,7 +190,7 @@ class BaiduUtil{
 		return $result['tbs'];
 	}
 
-	public function fetchWebUserInfo(){
+	public function fetchWebUserPrivateInfo(){
 		$result = $this->fetch('http://tieba.baidu.com/f/user/json_userinfo',FALSE);
 		$temData = $result['data'];
 		$result['i'] = array(
@@ -202,7 +202,7 @@ class BaiduUtil{
 		return $this->commonReturn($result);
 	}
 
-	public static function fetchWebUserPanel($un){
+	public static function fetchWebUserInfo($un){
 		$result = self::simpleFetch('http://tieba.baidu.com/home/get/panel?ie=utf-8&un=' . urlencode($un));
 		switch ($result['data']['sex']) {
 			case 'female':
@@ -226,9 +226,19 @@ class BaiduUtil{
 		return $data;
 	}
 
+	public static function fetchUid($un){
+		$result = self::fetchWebUserInfo($un);
+		return $result['data']['uid'];
+	}
+
+	public static function fetchHeadPhoto($un){
+		$result = self::fetchWebUserInfo($un);
+		return $result['data']['head_photo'];
+	}
+
 	public function fetchWebMeizhiPanel($uid,$un=NULL){
 		if(!is_null($un) && is_null($uid)){
-			$temUserInfo = self::fetchWebUserPanel($un);
+			$temUserInfo = self::fetchWebUserInfo($un);
 			$uid = $temUserInfo['data']['uid'];
 		}
 		$this->formData = array(
@@ -457,16 +467,6 @@ EOF;
 		return  $result;
 	}
 
-	public static function fetchUid($un){
-		$result = self::fetchWebUserPanel($un);
-		return $result['data']['uid'];
-	}
-
-	public static function fetchHeadPhoto($un){
-		$result = self::fetchWebUserPanel($un);
-		return $result['data']['head_photo'];
-	}
-
 	public function login($un,$passwd,$vcode = NULL,$vcode_md5 = NULL){
 		try{
 			$this->formData = array (
@@ -609,14 +609,14 @@ EOF;
 
 	public function meizhi($meizhi_uid = NULL, $votetype = 0, $meizhi_kw = NULL, $meizhi_fid = NULL){
 		try{
-			$votetype_list = array(
+			$votetypeList = array(
 					'meizhi',
 					'meizhi',
 					'weiniang',
 					'renyao',
 			);
 			if(is_null($meizhi_uid)){
-				$temResult = self::fetchWebUserPanel($meizhi_un);
+				$temResult = self::fetchWebUserInfo($meizhi_un);
 				$meizhi_uid = $temResult['data']['uid'];
 			}
 			$this->formData = array(
@@ -626,7 +626,7 @@ EOF;
 					'kw'        => $meizhi_kw?$meizhi_kw:'妹纸',
 					'uid'       => $meizhi_uid,
 					'scid'      => $this->uid(),
-					'vtype'     => $votetype_list[$votetype],
+					'vtype'     => $votetypeList[$votetype],
 					'ie'        => 'utf-8',
 					'vcode'     => '',
 					'new_vcode' => '1',
