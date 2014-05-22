@@ -79,6 +79,16 @@
 
 **返回值**
 
+###妹纸认证
+
+	public function meizhi($meizhi_un = NULL, $meizhi_uid = NULL, $votetype = 0, $meizhi_kw = NULL, $meizhi_fid = NULL)
+
+**参数**
+
+此方法可只传入一个参数$meizhi_un
+
+但为了减少HTTP请求，我们推荐你传入$meizhi_uid而不是$meizhi_un
+
 ##异常
 
 百度工具类在内部处理大部分异常并返回负值的错误码，能在外部捕获的异常只有构造函数中的异常

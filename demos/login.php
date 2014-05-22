@@ -1,6 +1,7 @@
 ﻿<?php
+require '../BaiduUtil.php';
+
 if($_POST){
-  require 'baiduutil.php';
   session_start();
   foreach ($_POST as &$data) {
     $data=trim($data);
