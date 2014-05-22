@@ -21,6 +21,7 @@ class BaiduUtil{
 	protected $forumPages = array();
 
 	public function __construct($cookie = NULL, $userinfo = array(), $client = NULL){
+		if(empty($cookie)) throw new Exception('请输入合法的cookie',-99);
 		if(!is_null($cookie)){
 			$cookie = trim($cookie);
 			if(stripos($cookie,'bduss=') === FALSE && stripos($cookie,';') === FALSE){
