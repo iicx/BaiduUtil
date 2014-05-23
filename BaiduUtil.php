@@ -21,20 +21,21 @@ class BaiduUtil{
 	protected $forumPages = array();
 
 	public function __construct($cookie = NULL, $userinfo = array(), $client = NULL){
-		$cookie = trim($cookie);
-		if(empty($cookie)) throw new Exception('请输入合法的cookie',-99);
-		$temCookieHasBduss = stripos($cookie,'bduss=');
-		$temCookieHasSemicolon = stripos($cookie,';');
-		if($temCookieHasBduss === FALSE &&  $temCookieHasSemicolon === FALSE){
-			$this->bduss = $cookie;
-		}elseif($temCookieHasBduss !== FALSE && $temCookieHasSemicolon === FALSE){
-			$this->bduss = substr($cookie,6);
-		}elseif(preg_match('/bduss\s?=\s?([^ ;]*)/i',$cookie,$matches)){
-			$this->bduss = $matches[1];
-		}else{
-			throw new Exception('请输入合法的cookie',-99);
+		if(!is_null($cookie)){
+			$cookie = trim($cookie);
+			$temCookieHasBduss = stripos($cookie,'bduss=');
+			$temCookieHasSemicolon = stripos($cookie,';');
+			if($temCookieHasBduss === FALSE &&  $temCookieHasSemicolon === FALSE){
+				$this->bduss = $cookie;
+			}elseif($temCookieHasBduss !== FALSE && $temCookieHasSemicolon === FALSE){
+				$this->bduss = substr($cookie,6);
+			}elseif(preg_match('/bduss\s?=\s?([^ ;]*)/i',$cookie,$matches)){
+				$this->bduss = $matches[1];
+			}else{
+				throw new Exception('请输入合法的cookie',-99);
+			}
+			$this->cookie = $this->buildFullCookie();
 		}
-		$this->cookie = $this->buildFullCookie();
 		if(is_null($client)){
 			$this->client = self::getClient();
 		}else{
@@ -156,7 +157,7 @@ class BaiduUtil{
 		return $hash;
 	}
 
-	public function clientRelogin(){
+	protected function clientRelogin(){
 		$this->formData = array(
 				'bdusstoken' => $this->bduss
 		);
@@ -171,7 +172,6 @@ class BaiduUtil{
 					throw new Exception('Relogin失败,status:'.$result['error_code'].',msg'.$result['error_msg'],-15);
 					break;
 			}
-			
 		}
 	}
 
