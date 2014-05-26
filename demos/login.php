@@ -58,7 +58,7 @@ if($_POST){
     <div class="panel panel-primary form-panel">
       <div class="panel-heading">百度登录测试页</div>
       <div class="panel-body">
-        <form class="form-horizontal" role="form" method="post" action="index.php">
+        <form class="form-horizontal" role="form" method="post" action="<?= $_SERVER['PHP_SELF'] ?>">
               <div class="form-group">
                   <label for="input_user_name" class="col-sm-3 control-label">用户名</label>
                   <div class="col-sm-9">

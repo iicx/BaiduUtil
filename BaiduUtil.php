@@ -29,7 +29,7 @@ class BaiduUtil{
 				$this->bduss = $cookie;
 			}elseif($temCookieHasBduss !== FALSE && $temCookieHasSemicolon === FALSE){
 				$this->bduss = substr($cookie,6);
-			}elseif(preg_match('/bduss\s?=\s?([^ ;]*)/i',$cookie,$matches)){
+			}elseif(preg_match('/bduss\s?=\s?([^ ;]*)/i', $cookie, $matches)){
 				$this->bduss = $matches[1];
 			}else{
 				throw new Exception('请输入合法的cookie',-99);
@@ -494,7 +494,9 @@ EOF;
 			}
 			$result = $this->fetch('http://c.tieba.baidu.com/c/s/login',TRUE,FALSE);
 			if($result['error_code'] == 0){
-				$this->bduss = $result['user']['BDUSS'];
+				$temRawBduss = $result['user']['BDUSS'];
+				preg_match('/(.*)\|/', $temRawBduss, $matches);
+				$this->bduss = $matches[1];
 				$this->cookie = $this->buildFullCookie();
 				$result['i'] = array(
 						"uid"    => $result['user']['id'],
