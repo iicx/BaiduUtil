@@ -4,7 +4,7 @@
   <head>
     <meta charset='utf-8' />
     <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="BaiduUtil : 百度贴吧工具类。祝贴吧生活愉快~~" />
+    <meta name="description" content="BaiduUtil : 百度贴吧工具类。祝贴吧生活愉快！" />
 
     <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
 
@@ -19,7 +19,7 @@
           <a id="forkme_banner" href="https://github.com/iicx/BaiduUtil">View on GitHub</a>
 
           <h1 id="project_title">BaiduUtil</h1>
-          <h2 id="project_tagline">百度贴吧工具类。祝贴吧生活愉快~~</h2>
+          <h2 id="project_tagline">百度贴吧工具类。祝贴吧生活愉快！</h2>
 
             <section id="downloads">
               <a class="zip_download_link" href="https://github.com/iicx/BaiduUtil/zipball/master">Download this project as a .zip file</a>
@@ -119,6 +119,18 @@ $test-&gt;returnThis()-&gt;zan("chrome")-&gt;zan("firefox")-&gt;multiSign()-&gt;
 
 <p><strong>返回值</strong></p>
 
+<h3>
+<a name="%E5%A6%B9%E7%BA%B8%E8%AE%A4%E8%AF%81" class="anchor" href="#%E5%A6%B9%E7%BA%B8%E8%AE%A4%E8%AF%81"><span class="octicon octicon-link"></span></a>妹纸认证</h3>
+
+<pre><code>public function meizhi($meizhi_un = NULL, $meizhi_uid = NULL, $votetype = 0, $meizhi_kw = NULL, $meizhi_fid = NULL)
+</code></pre>
+
+<p><strong>参数</strong></p>
+
+<p>此方法可只传入一个参数$meizhi_un</p>
+
+<p>但为了减少HTTP请求，我们推荐你传入$meizhi_uid而不是$meizhi_un</p>
+
 <h2>
 <a name="%E5%BC%82%E5%B8%B8" class="anchor" href="#%E5%BC%82%E5%B8%B8"><span class="octicon octicon-link"></span></a>异常</h2>
 
@@ -134,6 +146,7 @@ $test-&gt;returnThis()-&gt;zan("chrome")-&gt;zan("firefox")-&gt;multiSign()-&gt;
 <li>-16 doTdouLottery() 免费抽奖机会已经用完 </li>
 <li>-17 doMultiSign() 没有可以一键签到的贴吧</li>
 <li>-18 getForumInfo() 获取的贴吧页面没有点赞信息</li>
+<li>-19 clientRelogin() 用户未登录或登录失败，请更换账号或重试</li>
 <li>-99 __construct() 请输入合法的cookie</li>
 </ul>
       </section>
