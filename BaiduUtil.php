@@ -537,7 +537,7 @@ EOF;
 					'un'			=> $un,
 					'passwd'		=> base64_encode($passwd),
 					"need_vcode"	=> $result['anti']['need_vcode'],
-					"vcode_md5"	 => $result['anti']['vcode_md5'],
+					"vcode_md5"		=> $result['anti']['vcode_md5'],
 					"vcode_pic_url" => $result['anti']['vcode_pic_url'],
 				);
 			}
