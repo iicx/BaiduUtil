@@ -11,7 +11,7 @@ class BaiduUtil{
 	public $lastFetch	 = array();
 	public $lastReturn	= array();
 	public $lastformData  = array();
-	
+
 	protected $un		 = '';
 	protected $uid		= '';
 	protected $tbs		= '';
@@ -382,29 +382,34 @@ class BaiduUtil{
 		return $this->commonReturn($result);
 	}
 
-	/* 获取网页上的贴吧 */
-	public function fetchWebLikedForumList($num=1000){
+	/* 获取web版贴吧，可全部取出 */
+	public function fetchWebLikedForumList($maxNum=1000){
 		$cookie = $this->cookie;
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, 'http://tieba.baidu.com/f/like/mylike');
 		curl_setopt($ch, CURLOPT_COOKIE, $cookie);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+			'Accept-Encoding: gzip'
+			));
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		$content = curl_exec($ch);
+		$content = gzdecode(curl_exec($ch));
 		$content = iconv('GBK', 'UTF-8', $content);
 		preg_match('/<a href="\/f\/like\/mylike\?&pn=(\d+)">尾页/', $content , $result);
 		$len = $result[1];
-		for($i=2;$i<=$len;$i++){
+		for($i=2; $i<=$len; $i++){
 			curl_setopt($ch, CURLOPT_URL, 'http://tieba.baidu.com/f/like/mylike?pn='.$i);
-			$tem=curl_exec($ch);
-			$content.=iconv('GBK', 'UTF-8', $tem);
+			$tem = gzdecode(curl_exec($ch));
+			$content.= iconv('GBK', 'UTF-8', $tem);
 		}
 		curl_close($ch);
 		preg_match_all('/kw=[^>]+>([^<]+)</', $content, $result);
-		for($i=0;isset($result[1][$i])&&$i<2*$num;$i+=2){
-			$re['data'][$i/2]['forum_name']=$result[1][$i];
-			$re['data'][$i/2]['forum_exp']=$result[1][$i+1];
+		for($i=0; isset($result[1][$i]) && $i<2*$maxNum; $i+=2){
+			$re['like_forum'][$i/2]['forum_name']=$result[1][$i];
+			$re['like_forum'][$i/2]['forum_exp']=$result[1][$i+1];
 		}
-		return $re;
+		$res['error_code'] = 0;
+		$res['i'] = $re;
+		return $this->commonReturn($res);
 	}
 
 	public function fetchClientLikedForumList(){
@@ -491,7 +496,7 @@ EOF;
 	}
 
 	protected function buildMeizhiResultArray($data){
-		$result = array( 
+		$result = array(
 				'meizhi'	   => $data['data']['vote_count']['meizhi'],
 				'weiniang'	 => $data['data']['vote_count']['weiniang'],
 				'renyao'	   => $data['data']['vote_count']['renyao'],
@@ -499,8 +504,8 @@ EOF;
 				'exp_value'	=> $data['data']['exp_value'], // 还需经验数
 				'levelup_left' => $data['data']['levelup_left'], /*升级还需票数*/
 		);
-		$resultstr = '当前的妹纸票：' . $result['meizhi'] . '，伪娘票：' . $result['weiniang'] . '，人妖票：' . $result['renyao'] . 
-					'。<br>认证等级为' . $result['level'] . '级，再获得' . $result['exp_value'] . 
+		$resultstr = '当前的妹纸票：' . $result['meizhi'] . '，伪娘票：' . $result['weiniang'] . '，人妖票：' . $result['renyao'] .
+					'。<br>认证等级为' . $result['level'] . '级，再获得' . $result['exp_value'] .
 					'点经验和' . $result['levelup_left'] . '张妹纸票后升级。';
 		$result['str'] = $resultstr;
 		return  $result;
@@ -575,7 +580,7 @@ EOF;
 			if(!@count($forums)) throw new Exception("没有可以一键签到的贴吧", -17);
 			foreach($forums['data'] as $forum){
 				$forum_ids .= $forum['forum_id'] . ',';
-			}		
+			}
 			$forum_ids = substr($forum_ids,0,-1);
 			$this->formData = array(
 				'forum_ids' => $forum_ids,
@@ -778,19 +783,41 @@ EOF;
 
 	public function signForZhidao(){
 		$cookie = $this->cookie;
+
+		/* webSign */
 		$postData = 'cm=100509';
-		$url = 'http://zhidao.baidu.com/submit/user';
 		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_URL, 'http://zhidao.baidu.com/submit/user');
 		curl_setopt($ch, CURLOPT_COOKIE, $cookie);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		$content = curl_exec($ch);
+
+
+		/* clientSign */
+		curl_setopt($ch, CURLOPT_URL, 'http://zhidao.baidu.com/mapi/act/v4/signreward');
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+			'Accept: application/json',
+			'Origin: http://zhidao.baidu.com',
+			'X-Requested-With: XMLHttpRequest',
+			'User-Agent: Mozilla/5.0 (Linux; Android 4.4.4; m1 note Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/33.0.0.0 Mobile Safari/537.36',
+			'Referer: http://zhidao.baidu.com/s/sign/index.html',
+			'Accept-Encoding: gzip,deflate',
+			'Accept-Language: zh-CN,en-US;q=0.8'
+			));
+		curl_setopt($ch, CURLOPT_POSTFIELDS, '');
+
+		$content2 = curl_exec($ch);
 		curl_close($ch);
-
-
-		return json_decode($content, 1);
-		//0且msg是success表示成功,2表示已签
+		$res = array(
+			'webSign'    => json_decode($content,true),
+			'clientSign' => json_decode($content2,true)
+			);
+		if($ret['webSign']['errorNo'] === 0 || $res['webSign']['errorNo'] === 2){
+			$ret['error_code'] = 0;
+		}
+		$ret['i'] = $res;
+		return $this->commonReturn($ret);
 	}
 
 	/* 尼玛这个返回值一直是俩0..不知道怎样才是成功的 */
@@ -800,7 +827,7 @@ EOF;
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_COOKIE,$cookie);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
 			'Referer:http://wenku.baidu.com/task/browse/daily',
 			'User-Agent:Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2224.3 Safari/537.36',
@@ -810,7 +837,10 @@ EOF;
 		curl_close($ch);
 		$this->collect_book($this->bduss);
 		$this->delete_book($this->bduss);
-		return json_decode($content, 1);
+		$re = json_decode($content, true);
+		$ret['error_code'] = 0;
+		$ret['i'] = $re;
+		return $this->commonReturn($ret);
 	}
 
 	private function collect_book($BDUSS){
@@ -840,7 +870,7 @@ EOF;
 		curl_setopt($ch,CURLOPT_POSTFIELDS,http_build_query($array));
 		$re = @json_decode(curl_exec($ch),ture);
 		curl_close( $ch );
-		return $re;	  
+		return $re;
 	}
 
 
@@ -870,36 +900,41 @@ EOF;
 		);
 		curl_setopt($ch,CURLOPT_POSTFIELDS,http_build_query($array));
 		$re = @json_decode(curl_exec($ch),ture);
-		curl_close( $ch );
-		return $re;	  
+		curl_close($ch);
+		return $re;
 	}
 
 	/* 百度知道免费抽奖 */
-	public function zhidaoFreeLuck(){
+	public function zhidaoFreeLottery(){
 		$cookie = $this->cookie;
 		$ch = curl_init();
-		$url = 'http://zhidao.baidu.com/shop/lottery';
+		$url = 'https://zhidao.baidu.com/shop/lottery';
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_COOKIE, $cookie);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		$content = curl_exec($ch);
+		$content = iconv('GBK', 'UTF-8', curl_exec($ch));
 		preg_match_all('/\'luckyToken\', \'(\w+)\'|\'freeChance\', \'(\w+)\'/', $content, $result);
 		$freeChance = $result[2][0];
-		if($freeChance != '1'){
-			$re['errno'] = '1';
-			$re['errmsg'] = '当前没有免费抽奖';
-			return $re;
+		if($freeChance !== '1'){
+			$ret['error_msg'] = '当前没有免费抽奖';
+			$ret['error_code'] = 1;
+			return $this->commonReturn($ret);
 		}
 		$luckyToken = $result[1][1];
-		$url = "http://zhidao.baidu.com/shop/submit/lottery?type=0&token={$luckyToken}";
+		$url = "https://zhidao.baidu.com/shop/submit/lottery?type=0&token={$luckyToken}";
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-			'Referer:http://zhidao.baidu.com/shop/lottery',
+			'Referer:https://zhidao.baidu.com/shop/lottery',
 			'User-Agent:Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2224.3 Safari/537.36',
 			'X-Requested-With: XMLHttpRequest'
 			));
 		$content = curl_exec($ch);
 		curl_close($ch);
-		return json_decode($content,true);
+		$res_json = json_decode($content, true);
+		$ret['error_code'] = $res_json['errno'];
+		$ret['error_msg'] = $res_json['errmsg'];
+		return $this->commonReturn($ret);
 	}
 }
