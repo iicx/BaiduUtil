@@ -49,7 +49,7 @@
 
 ----------
 
-###签到
+###贴吧签到
 
 **原型**
 
@@ -89,6 +89,55 @@
 
 但为了减少HTTP请求，我们推荐你传入$meizhi_uid而不是$meizhi_un
 
+----------
+
+###知道签到
+
+**原型**
+
+	public function signForZhidao()
+
+**参数**
+
+**返回值**
+
+- webSign……网页签到情况
+	- errorNo……0表示签到成功,2表示已签
+	- msg……错误信息
+- clientSign……客户端签到情况(可自动领取财富值奖励)
+	- errNo……错误码,0表示成功,其它未知
+	- ererstr……错误信息
+
+
+----------
+
+###知道免费抽奖
+
+**原型**
+
+	public function zhidaoFreeLottery()
+
+**参数**
+
+**返回值**
+
+
+----------
+
+###文库签到
+
+**原型**
+
+	public function signForWenku()
+
+**参数**
+
+**返回值**
+
+- errno……不管成功没成功，百度文库返回的都是0。。。
+- error_no……同上
+
+
 ##异常
 
 百度工具类在内部处理大部分异常并返回负值的错误码，能在外部捕获的异常只有构造函数中的异常
@@ -99,7 +148,7 @@
 - -13 getForumInfo() 无法取得pid
 - -14 fetchWebTbs() 获取webtbs失败
 - -15 clientRelogin() clientRelogin失败
-- -16 doTdouLottery() 免费抽奖机会已经用完 
+- -16 doTdouLottery() 免费抽奖机会已经用完
 - -17 doMultiSign() 没有可以一键签到的贴吧
 - -18 getForumInfo() 获取的贴吧页面没有点赞信息
 - -19 clientRelogin() 用户未登录或登录失败，请更换账号或重试
