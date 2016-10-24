@@ -115,7 +115,7 @@
 
 **原型**
 
-	public function signForZhidao()
+	public function zhidaoFreeLottery()
 
 **参数**
 
@@ -128,7 +128,7 @@
 
 **原型**
 
-	public function zhidaoFreeLottery()
+	public function signForWenku()
 
 **参数**
 
